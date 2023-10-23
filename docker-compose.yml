@@ -1,0 +1,63 @@
+version: "3.7"
+services:
+  app:
+    build:
+      args:
+        user: ksn38
+        uid: 1000
+      context: .
+      dockerfile: Dockerfile
+    image: php8.1
+    container_name: app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./index:/var/www
+      - ./php:/usr/local/etc/php
+      - ./logs/php:/var/log/php
+    networks:
+      - app-network
+    ports:
+      - "8000:8000"
+#    command: php artisan serve --host=0.0.0.0
+
+  db:
+    image: mysql:8
+    container_name: app-db
+#    restart: unless-stopped
+    environment:
+#      MYSQL_DATABASE: ${MYSQL_DATABASE}
+#      MYSQL_USER: ${MYSQL_USER}
+#      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: 1
+    volumes:
+      - ./logs/mysql:/var/log/mysql
+      - ./mysql:/var/lib/mysql
+#      - ./backend/psql_dump:/home/ksn38
+    networks:
+      - app-network
+    ports:
+      - "3306:3306"
+    depends_on:
+      - app
+
+  nginx:
+    depends_on:
+      - app
+    image: nginx:alpine
+    container_name: app-nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./index:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+      - ./logs/nginx:/var/log/nginx/
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
