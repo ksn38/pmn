@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     libpq-dev \
     libfreetype6-dev \
-    && pecl install ds && docker-php-ext-enable ds
+    && pecl install ds && docker-php-ext-enable ds \
+    && pecl install xdebug && docker-php-ext-enable xdebug
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

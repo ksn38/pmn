@@ -15,11 +15,13 @@ services:
       - ./index:/var/www
       - ./php:/usr/local/etc/php
       - ./logs/php:/var/log/php
+      - ./logs/xdebug:/var/tmp
     networks:
       - app-network
     ports:
       - "8000:8000"
-#    command: php artisan serve --host=0.0.0.0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   db:
     image: mysql:8
